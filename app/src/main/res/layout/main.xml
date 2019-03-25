@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:textSize="25sp"
+        android:text=" save" />
+
+    <Button
+        android:id="@+id/end_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="25sp"
+        android:text=" end" />
+
+    <Button
+        android:id="@+id/reset_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="25sp"
+        android:text=" reset" />
+
+    <TextView
+        android:id="@+id/textTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:textSize="25sp"
+        android:text=" textTime " />
+
+    <TextView
+        android:id="@+id/textStepCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textTime"
+        android:textSize="25sp"
+        android:text=" textStepCount" />
+
+    <TextView
+        android:id="@+id/textHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textStepCount"
+        android:textSize="25sp"
+        android:text=" textHeading" />
+
+    <TextView
+        android:id="@+id/textLength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textHeading"
+        android:textSize="25sp"
+        android:text=" textLength" />
+
+    <TextView
+        android:id="@+id/textPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textLength"
+        android:textSize="25sp"
+        android:text=" textPosition" />
+
+    <TextView
+        android:id="@+id/textPose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textPosition"
+        android:textSize="25sp"
+        android:text=" textPose" />
+
+    <TextView
+        android:id="@+id/textAxis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textPose"
+        android:textSize="25sp"
+        android:text=" textAxis" />
+
+    <TextView
+        android:id="@+id/textRoomState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textAxis"
+        android:textSize="25sp"
+        android:text=" textRoomState" />
+
+    <TextView
+        android:id="@+id/textFileState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textRoomState"
+        android:textSize="25sp"
+        android:text=" textFileState" />
+
+    <Button
+        android:id="@+id/door_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/reset_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="25dp"
+        android:text="Door" />
+
+</RelativeLayout>
