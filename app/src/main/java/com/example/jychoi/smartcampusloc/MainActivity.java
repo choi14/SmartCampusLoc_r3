@@ -47,6 +47,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    //msjang
 
     /**
      * Log TAG
