@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 //import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 //import android.content.IntentFilter;
@@ -19,6 +20,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 //import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,9 +34,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +59,10 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    //msjang
+    //msjang test variable
+
+    File for_HTTP_send = null;
+
 
     /**
      * Log TAG
@@ -115,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * TextView (User interface)
      */
-    private TextView[] textView = new TextView[9];
+    private TextView[] textView = new TextView[11];
 
 
     /**
@@ -217,6 +232,8 @@ public class MainActivity extends AppCompatActivity {
         textView[6] = findViewById(R.id.textAxis);
         textView[7] = findViewById(R.id.textRoomState);
         textView[8] = findViewById(R.id.textFileState);
+        textView[9] = findViewById(R.id.text_HTTP_response);
+        textView[10] = findViewById(R.id.text_RTT);
 
         //Button configuration
         final Button save_button = findViewById(R.id.save_button);
@@ -289,7 +306,17 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.end_button:
                         Log.i(TAG1, "Call end");
                         textView[8].setText(" File State: End");
-                        endSave();
+
+                        //msjang for save
+
+                        try {
+                            endSave();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        //// msjang end
+
                         resetParameter();
                         break;
                     case R.id.reset_button:
@@ -393,8 +420,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (mkdirsucc) {
             try {
+
                 for (int i = 0; i < rafNumber; i++) {
                     directory[i] = new File(file.getCanonicalPath() + filename[i]);
+
+                    //msjang test variable
+                    for_HTTP_send = directory[4];
+
                     raf[i] = new RandomAccessFile(directory[i], "rw");
                 }
             } catch (IOException e) {
@@ -417,7 +449,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void endSave() {
+    public void endSave() throws IOException {
+
+        // msjang HTTP file POST
+        String url = "http://sim5.mwnl.snu.ac.kr/upload6.php";
+        ContentValues values = new ContentValues();
+        values.put("TEST_KEY" , "TEST_VALUE");
+
+        NetworkTask networkTask = new NetworkTask(url, values);
+        networkTask.execute();
+
         for (int i = 0; i < rafNumber; i++) {
             raf[i] = null;
         }
@@ -964,6 +1005,161 @@ public class MainActivity extends AppCompatActivity {
 //            sb.append(String.format("%02x ", b&0xff));
 //        return sb.toString();
 //    }
+
+
+    // msjang http post
+
+    public class NetworkTask extends AsyncTask<Void, Void, String> {
+
+        private String url;
+        private ContentValues values;
+        private long RTT_calc = 0; //RTT 체크용
+
+        public NetworkTask(String url, ContentValues values) {
+
+            this.url = url;
+            this.values = values;
+            this.RTT_calc =  System.currentTimeMillis(); //RTT 체크용
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            //String result; // 요청 결과를 저장할 변수.
+
+
+            //String server_file_name = "data.csv";   // 서버에 저장되는 파일의 이름.
+
+            /*
+            // 테스트용 더미 파일 생성
+
+            String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "TEST_HTTP_POST" + "/";
+            File file_dir = new File(dirPath);
+            if (!file_dir.exists())
+                file_dir.mkdirs();
+
+            BufferedWriter bfw;
+
+            try
+            {
+                bfw = new BufferedWriter(new FileWriter(dirPath + "TEST" +".txt", false));
+                bfw.write("TESTABAAA");
+                bfw.flush();
+                bfw.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            File file = new File(dirPath+"TEST" +".txt");
+
+            // 테스트용 더미 파일 생성 종료
+
+
+
+            */
+
+            String php_key = "userfile";  // 서버의 php파일에 있는 key와 동일하게 만들어야함
+            String server_file_name = for_HTTP_send.getName();   // 서버에 저장되는 파일의 이름.
+
+            try {
+                URL url_ = new URL(this.url);
+                String boundary = "SpecificString";
+                URLConnection con = url_.openConnection();
+                con.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                con.setDoOutput(true);
+
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+
+                wr.writeBytes("\r\n--" + boundary + "\r\n");
+                wr.writeBytes( "Content-Disposition: form-data; name=\"" + php_key + "\";filename=\"" + server_file_name + "\"" + "\r\n" ) ;
+                wr.writeBytes("Content-Type: application/octet-stream\r\n\r\n");
+
+                FileInputStream fileInputStream = new FileInputStream(for_HTTP_send.getPath());  //파일의 절대경로
+                int bytesAvailable = fileInputStream.available();
+                int maxBufferSize = 1024;
+                int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                byte[] buffer = new byte[bufferSize];
+
+                int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                while (bytesRead > 0)
+                {
+                    // Upload file part(s)
+                    DataOutputStream dataWrite = new DataOutputStream(con.getOutputStream());
+                    dataWrite.write(buffer, 0, bufferSize);
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                }
+                fileInputStream.close();
+
+                wr.writeBytes("\r\n--" + boundary + "--\r\n");
+                wr.flush();
+
+                BufferedReader reader = null;
+
+                reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+                String line;
+                String page = "";
+
+                // 라인을 받아와 합친다.
+                while ((line = reader.readLine()) != null){
+                    page += line;
+                }
+
+                return page;
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+
+            return null;
+        }
+
+
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            textView[9].setText(s);
+            textView[10].setText(String.valueOf(System.currentTimeMillis()-RTT_calc));
+            /*
+             // 데이터 처리 관련 주석처리 하였음.
+
+            int x = 0;
+            int y = 0;
+
+            Pattern groupPattern = Pattern.compile("x=(.*?);");
+            Matcher groupMatcher = groupPattern.matcher(s);
+
+            if(groupMatcher.find())
+            {
+                x = Integer.parseInt(groupMatcher.group(1));
+            }
+
+            groupPattern = Pattern.compile("y=(.*?);");
+            groupMatcher = groupPattern.matcher(s);
+
+            if(groupMatcher.find())
+            {
+                y  = Integer.parseInt(groupMatcher.group(1));
+            }
+
+            x_coord.setText(String.valueOf(x));
+            y_coord.setText(String.valueOf(y));
+            RTT = (TextView) findViewById(R.id.RTT);
+            RTT.setText(String.valueOf(System.currentTimeMillis()-time) + " ms");
+
+            */
+        }
+    }
 
     @Override
     protected void onDestroy() {

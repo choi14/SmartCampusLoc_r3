@@ -112,6 +112,24 @@
         android:textSize="25sp"
         android:text=" textFileState" />
 
+    <TextView
+        android:id="@+id/text_HTTP_response"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textFileState"
+        android:textSize="25sp"
+        android:text=" text_HTTP_response" />
+
+    <TextView
+        android:id="@+id/text_RTT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_HTTP_response"
+        android:textSize="25sp"
+        android:text=" text_RTT" />
+
     <Button
         android:id="@+id/door_button"
         android:layout_width="wrap_content"
