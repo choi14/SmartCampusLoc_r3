@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         for (String anAddr : addr) {
             infoBle ble = new infoBle();
             ble.mac = anAddr;
-            ble.rssi = -100;
+            ble.rssi = -105;
             bleList.add(ble);
         }
     }
